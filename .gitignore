@@ -1,12 +1,22 @@
+# Environment
 .env
 .env.*
 !.env.example
-.DS_Store
+
+# Python
 __pycache__
-.idea
-KMS
 .venv
-.vscode
 *.egg-info
 .pytest_cache
 .ruff_cache
+
+# Node / Frontend
+web/node_modules
+web/.next
+web/.turbo
+
+# IDE
+.idea
+.vscode
+.DS_Store
+KMS
