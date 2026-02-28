@@ -9,4 +9,4 @@ MODE="${1:-dev}"
 
 cd "$PROJECT_DIR"
 echo "Starting agent in $MODE mode..."
-uv run python src/agent.py "$MODE"
+uv run python agent/agent.py "$MODE"

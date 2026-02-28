@@ -40,9 +40,14 @@ coverage/
 # Project docs and misc
 README.md
 LICENSE
+AGENTS.md
+scripts/
 
 # Project tests
 test/
 tests/
 eval/
 evals/
+
+# Frontend (not needed in agent Docker image)
+web/

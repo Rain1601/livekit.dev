@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from dotenv import load_dotenv
 from livekit.agents import (
@@ -12,7 +13,7 @@ from livekit.plugins import openai
 
 logger = logging.getLogger("agent")
 
-load_dotenv(".env.local")
+load_dotenv(Path(__file__).resolve().parent.parent / ".env.local")
 
 
 class Assistant(Agent):

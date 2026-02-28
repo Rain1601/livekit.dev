@@ -19,4 +19,7 @@ web/.turbo
 .idea
 .vscode
 .DS_Store
+
+# Misc
 KMS
+*.log

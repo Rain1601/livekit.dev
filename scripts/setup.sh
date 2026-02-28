@@ -12,12 +12,12 @@ uv sync
 
 echo ""
 echo "=== Downloading agent models ==="
-uv run python src/agent.py download-files
+uv run python agent/agent.py download-files
 
 echo ""
 echo "=== Installing frontend dependencies ==="
 cd "$PROJECT_DIR/web"
-/usr/local/bin/pnpm install
+pnpm install
 
 echo ""
 echo "========================================="
