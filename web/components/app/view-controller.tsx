@@ -2,9 +2,9 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { useSessionContext } from '@livekit/components-react';
-import type { AppConfig } from '@/app-config';
 import { SessionView } from '@/components/app/session-view';
 import { WelcomeView } from '@/components/app/welcome-view';
+import { useAppConfig } from '@/hooks/useAppConfig';
 
 const MotionWelcomeView = motion.create(WelcomeView);
 const MotionSessionView = motion.create(SessionView);
@@ -27,11 +27,8 @@ const VIEW_MOTION_PROPS = {
   },
 };
 
-interface ViewControllerProps {
-  appConfig: AppConfig;
-}
-
-export function ViewController({ appConfig }: ViewControllerProps) {
+export function ViewController() {
+  const appConfig = useAppConfig();
   const { isConnected, start } = useSessionContext();
 
   return (
@@ -46,9 +43,7 @@ export function ViewController({ appConfig }: ViewControllerProps) {
         />
       )}
       {/* Session view */}
-      {isConnected && (
-        <MotionSessionView key="session-view" {...VIEW_MOTION_PROPS} appConfig={appConfig} />
-      )}
+      {isConnected && <MotionSessionView key="session-view" {...VIEW_MOTION_PROPS} />}
     </AnimatePresence>
   );
 }

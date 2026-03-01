@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import {
   AccessToken,
-  AgentDispatchClient,
   type AccessTokenOptions,
+  AgentDispatchClient,
   type VideoGrant,
 } from 'livekit-server-sdk';
 import { RoomConfiguration } from '@livekit/protocol';
@@ -36,8 +36,7 @@ export async function POST(req: Request) {
 
     // Parse agent configuration from request body
     const body = await req.json();
-    const agentName: string =
-      body?.room_config?.agents?.[0]?.agent_name || process.env.AGENT_NAME;
+    const agentName: string = body?.room_config?.agents?.[0]?.agent_name || process.env.AGENT_NAME;
     const agentConfig = body?.agent_config ?? {};
 
     // Separate provider keys from config — keys go into room metadata (not JWT)

@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   BotIcon,
   HomeIcon,
@@ -11,33 +13,26 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/shadcn/utils';
 
-type Page = 'main' | 'agent' | 'settings';
-
 interface NavItem {
-  id: Page;
+  href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'main', label: 'Main', icon: HomeIcon },
-  { id: 'agent', label: 'Agent', icon: BotIcon },
-  { id: 'settings', label: 'Settings', icon: KeyRoundIcon },
+  { href: '/', label: 'Main', icon: HomeIcon },
+  { href: '/agent', label: 'Agent', icon: BotIcon },
+  { href: '/settings', label: 'Settings', icon: KeyRoundIcon },
 ];
 
 interface NavSidebarProps {
-  activePage: Page;
-  onPageChange: (page: Page) => void;
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
 }
 
-export function NavSidebar({
-  activePage,
-  onPageChange,
-  collapsed,
-  onCollapsedChange,
-}: NavSidebarProps) {
+export function NavSidebar({ collapsed, onCollapsedChange }: NavSidebarProps) {
+  const pathname = usePathname();
+
   return (
     <TooltipProvider>
       <aside
@@ -49,15 +44,15 @@ export function NavSidebar({
         {/* Nav items */}
         <nav className="flex flex-1 flex-col gap-1 p-2 pt-4">
           {NAV_ITEMS.map((item) => {
-            const isActive = activePage === item.id;
+            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
             const Icon = item.icon;
 
             const button = (
               <Button
-                key={item.id}
+                key={item.href}
                 variant="ghost"
                 size={collapsed ? 'icon' : 'default'}
-                onClick={() => onPageChange(item.id)}
+                asChild
                 className={cn(
                   'w-full justify-start gap-3',
                   collapsed && 'justify-center',
@@ -66,14 +61,16 @@ export function NavSidebar({
                     : 'text-sidebar-foreground/70 hover:text-sidebar-foreground'
                 )}
               >
-                <Icon className="size-5 shrink-0" />
-                {!collapsed && <span className="text-sm">{item.label}</span>}
+                <Link href={item.href}>
+                  <Icon className="size-5 shrink-0" />
+                  {!collapsed && <span className="text-sm">{item.label}</span>}
+                </Link>
               </Button>
             );
 
             if (collapsed) {
               return (
-                <Tooltip key={item.id}>
+                <Tooltip key={item.href}>
                   <TooltipTrigger asChild>{button}</TooltipTrigger>
                   <TooltipContent side="right" sideOffset={8}>
                     {item.label}

@@ -3,13 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useSessionContext, useSessionMessages } from '@livekit/components-react';
-import type { AppConfig } from '@/app-config';
 import {
   AgentControlBar,
   type AgentControlBarControls,
 } from '@/components/agents-ui/agent-control-bar';
 import { ChatTranscript } from '@/components/app/chat-transcript';
 import { TileLayout } from '@/components/app/tile-layout';
+import { useAppConfig } from '@/hooks/useAppConfig';
 import { cn } from '@/lib/shadcn/utils';
 import { Shimmer } from '../ai-elements/shimmer';
 
@@ -81,14 +81,8 @@ export function Fade({ top = false, bottom = false, className }: FadeProps) {
   );
 }
 
-interface SessionViewProps {
-  appConfig: AppConfig;
-}
-
-export const SessionView = ({
-  appConfig,
-  ...props
-}: React.ComponentProps<'section'> & SessionViewProps) => {
+export const SessionView = ({ ...props }: React.ComponentProps<'section'>) => {
+  const appConfig = useAppConfig();
   const session = useSessionContext();
   const { messages } = useSessionMessages(session);
   const [chatOpen, setChatOpen] = useState(false);

@@ -10,6 +10,8 @@ export interface AgentConfig {
     allow_interruptions: boolean;
     min_interruption_duration_ms: number;
   };
+  system_prompt?: string;
+  greeting?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -20,6 +22,7 @@ export interface ProviderInfo {
   id: string;
   label: string;
   envKey: string;
+  consoleUrl: string;
   capabilities: ('llm' | 'stt' | 'tts' | 'realtime')[];
 }
 
@@ -28,32 +31,72 @@ export const ALL_PROVIDERS: ProviderInfo[] = [
     id: 'openai',
     label: 'OpenAI',
     envKey: 'OPENAI_API_KEY',
+    consoleUrl: 'https://platform.openai.com/api-keys',
     capabilities: ['llm', 'stt', 'tts', 'realtime'],
   },
-  { id: 'anthropic', label: 'Anthropic', envKey: 'ANTHROPIC_API_KEY', capabilities: ['llm'] },
+  {
+    id: 'anthropic',
+    label: 'Anthropic',
+    envKey: 'ANTHROPIC_API_KEY',
+    consoleUrl: 'https://console.anthropic.com/settings/keys',
+    capabilities: ['llm'],
+  },
   {
     id: 'google',
     label: 'Google',
     envKey: 'GOOGLE_API_KEY',
+    consoleUrl: 'https://aistudio.google.com/apikey',
     capabilities: ['llm', 'stt', 'tts', 'realtime'],
   },
-  { id: 'deepgram', label: 'Deepgram', envKey: 'DEEPGRAM_API_KEY', capabilities: ['stt'] },
-  { id: 'cartesia', label: 'Cartesia', envKey: 'CARTESIA_API_KEY', capabilities: ['tts'] },
-  { id: 'elevenlabs', label: 'ElevenLabs', envKey: 'ELEVENLABS_API_KEY', capabilities: ['tts'] },
-  { id: 'deepseek', label: 'DeepSeek', envKey: 'DEEPSEEK_API_KEY', capabilities: ['llm'] },
+  {
+    id: 'deepgram',
+    label: 'Deepgram',
+    envKey: 'DEEPGRAM_API_KEY',
+    consoleUrl: 'https://console.deepgram.com/',
+    capabilities: ['stt'],
+  },
+  {
+    id: 'cartesia',
+    label: 'Cartesia',
+    envKey: 'CARTESIA_API_KEY',
+    consoleUrl: 'https://play.cartesia.ai/',
+    capabilities: ['tts'],
+  },
+  {
+    id: 'elevenlabs',
+    label: 'ElevenLabs',
+    envKey: 'ELEVENLABS_API_KEY',
+    consoleUrl: 'https://elevenlabs.io/app/settings/api-keys',
+    capabilities: ['tts'],
+  },
+  {
+    id: 'deepseek',
+    label: 'DeepSeek',
+    envKey: 'DEEPSEEK_API_KEY',
+    consoleUrl: 'https://platform.deepseek.com/api_keys',
+    capabilities: ['llm'],
+  },
   {
     id: 'doubao',
     label: '豆包/Doubao',
     envKey: 'DOUBAO_API_KEY',
+    consoleUrl: 'https://console.volcengine.com/ark',
     capabilities: ['llm', 'stt', 'tts'],
   },
   {
     id: 'minimax',
     label: 'MiniMax',
     envKey: 'MINIMAX_API_KEY',
+    consoleUrl: 'https://platform.minimaxi.com/',
     capabilities: ['llm', 'stt', 'tts'],
   },
-  { id: 'qwen', label: '千问/Qwen', envKey: 'DASHSCOPE_API_KEY', capabilities: ['llm'] },
+  {
+    id: 'qwen',
+    label: '千问/Qwen',
+    envKey: 'DASHSCOPE_API_KEY',
+    consoleUrl: 'https://dashscope.console.aliyun.com/apiKey',
+    capabilities: ['llm'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -243,4 +286,6 @@ export const DEFAULT_CONFIG: AgentConfig = {
     allow_interruptions: true,
     min_interruption_duration_ms: 100,
   },
+  system_prompt: 'You are a helpful voice AI assistant.',
+  greeting: '',
 };

@@ -1,14 +1,14 @@
 'use client';
 
-import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
+import { type ReactNode, createContext, useContext, useEffect, useReducer } from 'react';
 import { createElement } from 'react';
 import {
+  type AgentConfig,
   DEFAULT_CONFIG,
   LLM_PROVIDERS,
   REALTIME_PROVIDERS,
   STT_PROVIDERS,
   TTS_PROVIDERS,
-  type AgentConfig,
 } from '@/lib/agent-config';
 
 const STORAGE_KEY = 'agent-config';
@@ -37,6 +37,8 @@ type Action =
   | { type: 'SET_SILENCE_DURATION'; value: number }
   | { type: 'SET_ALLOW_INTERRUPTIONS'; value: boolean }
   | { type: 'SET_MIN_INTERRUPTION_DURATION'; value: number }
+  | { type: 'SET_SYSTEM_PROMPT'; value: string }
+  | { type: 'SET_GREETING'; value: string }
   | { type: 'LOAD'; config: AgentConfig };
 
 function reducer(state: AgentConfig, action: Action): AgentConfig {
@@ -123,6 +125,11 @@ function reducer(state: AgentConfig, action: Action): AgentConfig {
         turn_detection: { ...state.turn_detection!, min_interruption_duration_ms: action.value },
       };
 
+    case 'SET_SYSTEM_PROMPT':
+      return { ...state, system_prompt: action.value };
+    case 'SET_GREETING':
+      return { ...state, greeting: action.value };
+
     case 'LOAD':
       return action.config;
 
@@ -167,11 +174,7 @@ export function AgentConfigProvider({ children }: { children: ReactNode }) {
     }
   }, [config]);
 
-  return createElement(
-    AgentConfigContext.Provider,
-    { value: { config, dispatch } },
-    children
-  );
+  return createElement(AgentConfigContext.Provider, { value: { config, dispatch } }, children);
 }
 
 export function useAgentConfig() {

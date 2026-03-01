@@ -20,7 +20,7 @@ export function Card({
   title,
   children,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; size?: number }>;
   title: string;
   children: React.ReactNode;
 }) {
@@ -28,7 +28,7 @@ export function Card({
     <div className="bg-card rounded-xl border p-5">
       <div className="mb-4 flex items-center gap-2.5">
         <div className="bg-muted flex size-8 items-center justify-center rounded-lg">
-          <Icon className="text-muted-foreground size-4" />
+          <Icon className="text-muted-foreground size-4" size={16} />
         </div>
         <h3 className="text-foreground text-sm font-medium">{title}</h3>
       </div>

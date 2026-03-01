@@ -20,6 +20,9 @@ web/.turbo
 .vscode
 .DS_Store
 
+# Data
+data/
+
 # Misc
 KMS
 *.log

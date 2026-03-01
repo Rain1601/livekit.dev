@@ -24,6 +24,7 @@ import {
   VAD_PROVIDERS,
   VAD_SENSITIVITY_OPTIONS,
 } from '@/lib/agent-config';
+import { PROVIDER_ICON_MAP } from '@/lib/provider-icons';
 
 export function AgentPage() {
   const { config, dispatch } = useAgentConfig();
@@ -82,7 +83,10 @@ export function AgentPage() {
 
           {config.mode === 'realtime' ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Card icon={ZapIcon} title="Realtime Model">
+              <Card
+                icon={PROVIDER_ICON_MAP[config.realtime?.provider ?? 'openai'] ?? ZapIcon}
+                title="Realtime Model"
+              >
                 <Field
                   label="Provider"
                   value={config.realtime?.provider ?? 'openai'}
@@ -119,7 +123,10 @@ export function AgentPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {/* LLM */}
-              <Card icon={BrainIcon} title="LLM">
+              <Card
+                icon={PROVIDER_ICON_MAP[config.llm?.provider ?? 'openai'] ?? BrainIcon}
+                title="LLM"
+              >
                 <Field
                   label="Provider"
                   value={config.llm?.provider ?? 'openai'}
@@ -146,7 +153,10 @@ export function AgentPage() {
               </Card>
 
               {/* STT / ASR */}
-              <Card icon={MicIcon} title="STT / ASR">
+              <Card
+                icon={PROVIDER_ICON_MAP[config.stt?.provider ?? 'deepgram'] ?? MicIcon}
+                title="STT / ASR"
+              >
                 <Field
                   label="Provider"
                   value={config.stt?.provider ?? 'deepgram'}
@@ -171,7 +181,10 @@ export function AgentPage() {
               </Card>
 
               {/* TTS */}
-              <Card icon={Volume2Icon} title="TTS">
+              <Card
+                icon={PROVIDER_ICON_MAP[config.tts?.provider ?? 'openai'] ?? Volume2Icon}
+                title="TTS"
+              >
                 <Field
                   label="Provider"
                   value={config.tts?.provider ?? 'openai'}

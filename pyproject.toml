@@ -12,6 +12,8 @@ dependencies = [
     "livekit-agents[openai,silero,turn-detector,deepgram,cartesia,elevenlabs,google,anthropic]~=1.4",
     "livekit-plugins-noise-cancellation~=0.2",
     "python-dotenv",
+    "fastapi[standard]>=0.115",
+    "sqlalchemy>=2.0",
 ]
 
 [dependency-groups]
@@ -23,7 +25,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["agent*"]
+include = ["agent*", "backend*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
