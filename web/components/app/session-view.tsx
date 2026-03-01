@@ -112,7 +112,7 @@ export const SessionView = ({
   }, [messages]);
 
   return (
-    <section className="bg-background relative z-10 h-svh w-svw overflow-hidden" {...props}>
+    <section className="bg-background relative z-10 h-full w-full overflow-hidden" {...props}>
       <Fade top className="absolute inset-x-4 top-0 z-10 h-40" />
       {/* transcript */}
       <ChatTranscript
@@ -125,7 +125,7 @@ export const SessionView = ({
       {/* Bottom */}
       <MotionBottom
         {...BOTTOM_VIEW_MOTION_PROPS}
-        className="fixed inset-x-3 bottom-0 z-50 md:inset-x-12"
+        className="absolute inset-x-3 bottom-0 z-50 md:inset-x-12"
       >
         {/* Pre-connect message */}
         {appConfig.isPreConnectBufferEnabled && (

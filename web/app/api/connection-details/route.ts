@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import { AccessToken, type AccessTokenOptions, type VideoGrant } from 'livekit-server-sdk';
+import {
+  AccessToken,
+  AgentDispatchClient,
+  type AccessTokenOptions,
+  type VideoGrant,
+} from 'livekit-server-sdk';
 import { RoomConfiguration } from '@livekit/protocol';
 
 type ConnectionDetails = {
@@ -31,18 +36,39 @@ export async function POST(req: Request) {
 
     // Parse agent configuration from request body
     const body = await req.json();
-    const agentName: string = body?.room_config?.agents?.[0]?.agent_name;
+    const agentName: string =
+      body?.room_config?.agents?.[0]?.agent_name || process.env.AGENT_NAME;
+    const agentConfig = body?.agent_config ?? {};
+
+    // Separate provider keys from config — keys go into room metadata (not JWT)
+    const { provider_keys, ...configWithoutKeys } = agentConfig;
 
     // Generate participant token
     const participantName = 'user';
     const participantIdentity = `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
     const roomName = `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`;
 
+    // Build room metadata for provider keys
+    const roomMetadata =
+      provider_keys && Object.keys(provider_keys).length > 0
+        ? JSON.stringify({ provider_keys })
+        : undefined;
+
     const participantToken = await createParticipantToken(
-      { identity: participantIdentity, name: participantName },
+      {
+        identity: participantIdentity,
+        name: participantName,
+        metadata: JSON.stringify(configWithoutKeys),
+      },
       roomName,
-      agentName
+      roomMetadata
     );
+
+    // Explicitly dispatch agent via API (more reliable than JWT roomConfig)
+    if (agentName) {
+      const dispatchClient = new AgentDispatchClient(LIVEKIT_URL, API_KEY, API_SECRET);
+      await dispatchClient.createDispatch(roomName, agentName);
+    }
 
     // Return connection details
     const data: ConnectionDetails = {
@@ -55,18 +81,17 @@ export async function POST(req: Request) {
       'Cache-Control': 'no-store',
     });
     return NextResponse.json(data, { headers });
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error);
-      return new NextResponse(error.message, { status: 500 });
-    }
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[connection-details]', error);
+    return new NextResponse(message, { status: 500 });
   }
 }
 
 function createParticipantToken(
   userInfo: AccessTokenOptions,
   roomName: string,
-  agentName?: string
+  roomMetadata?: string
 ): Promise<string> {
   const at = new AccessToken(API_KEY, API_SECRET, {
     ...userInfo,
@@ -78,13 +103,13 @@ function createParticipantToken(
     canPublish: true,
     canPublishData: true,
     canSubscribe: true,
+    roomCreate: true,
   };
   at.addGrant(grant);
 
-  if (agentName) {
-    at.roomConfig = new RoomConfiguration({
-      agents: [{ agentName }],
-    });
+  // Set room metadata for provider keys if present
+  if (roomMetadata) {
+    at.roomConfig = new RoomConfiguration({ metadata: roomMetadata });
   }
 
   return at.toJwt();

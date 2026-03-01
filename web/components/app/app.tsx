@@ -7,10 +7,12 @@ import { WarningIcon } from '@phosphor-icons/react/dist/ssr';
 import type { AppConfig } from '@/app-config';
 import { AgentSessionProvider } from '@/components/agents-ui/agent-session-provider';
 import { StartAudioButton } from '@/components/agents-ui/start-audio-button';
-import { ViewController } from '@/components/app/view-controller';
+import { AppLayout } from '@/components/app/app-layout';
 import { Toaster } from '@/components/ui/sonner';
+import { AgentConfigProvider, useAgentConfig } from '@/hooks/useAgentConfig';
 import { useAgentErrors } from '@/hooks/useAgentErrors';
 import { useDebugMode } from '@/hooks/useDebug';
+import { ProviderKeysProvider, useProviderKeys } from '@/hooks/useProviderKeys';
 import { getSandboxTokenSource } from '@/lib/utils';
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
@@ -26,12 +28,32 @@ interface AppProps {
   appConfig: AppConfig;
 }
 
-export function App({ appConfig }: AppProps) {
+function AppInner({ appConfig }: AppProps) {
+  const { config: agentConfig } = useAgentConfig();
+  const { keys: providerKeys } = useProviderKeys();
+
   const tokenSource = useMemo(() => {
-    return typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string'
-      ? getSandboxTokenSource(appConfig)
-      : TokenSource.endpoint('/api/connection-details');
-  }, [appConfig]);
+    if (typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string') {
+      return getSandboxTokenSource(appConfig);
+    }
+
+    // Custom token source that sends agent_config in the request body
+    return TokenSource.custom(async () => {
+      const agentName = appConfig.agentName;
+      const res = await fetch('/api/connection-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          room_config: agentName ? { agents: [{ agent_name: agentName }] } : undefined,
+          agent_config: { ...agentConfig, provider_keys: providerKeys },
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch connection details: ${res.statusText}`);
+      }
+      return res.json();
+    });
+  }, [appConfig, agentConfig, providerKeys]);
 
   const session = useSession(
     tokenSource,
@@ -41,9 +63,7 @@ export function App({ appConfig }: AppProps) {
   return (
     <AgentSessionProvider session={session}>
       <AppSetup />
-      <main className="grid h-svh grid-cols-1 place-content-center">
-        <ViewController appConfig={appConfig} />
-      </main>
+      <AppLayout appConfig={appConfig} />
       <StartAudioButton label="Start Audio" />
       <Toaster
         icons={{
@@ -60,5 +80,15 @@ export function App({ appConfig }: AppProps) {
         }
       />
     </AgentSessionProvider>
+  );
+}
+
+export function App({ appConfig }: AppProps) {
+  return (
+    <AgentConfigProvider>
+      <ProviderKeysProvider>
+        <AppInner appConfig={appConfig} />
+      </ProviderKeysProvider>
+    </AgentConfigProvider>
   );
 }
